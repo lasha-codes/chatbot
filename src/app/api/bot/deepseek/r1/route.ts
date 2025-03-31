@@ -33,7 +33,9 @@ export const POST = async (req: Request) => {
       }
     )
 
-    const output = response.data.choices[0].message.reasoning
+    const output =
+      response?.data?.choices?.[0]?.message?.reasoning ||
+      "Couldn't get a response."
 
     return NextResponse.json({ response: output }, { status: 201 })
   } catch (err) {

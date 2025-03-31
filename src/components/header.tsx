@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from './theme-toggle'
 
 const models = [
   { id: 'gpt-4o', name: 'GPT-4o' },
@@ -36,6 +37,8 @@ export function Header() {
             selectedModel={selectedModel}
             setSelectedModel={setSelectedModel}
           />
+
+          <ThemeToggle />
         </div>
       </div>
     </header>
@@ -56,7 +59,7 @@ function ModelSelector({
       <DropdownMenuTrigger asChild>
         <Button
           variant='outline'
-          className='flex items- justify-between gap-2 rounded-[4px] w-[200px]'
+          className='flex items-center justify-between gap-2 rounded-[4px] w-[200px] dark:bg-[#0A0A0A]'
         >
           <span>Model: {selectedModel.name}</span>
           <ChevronDown className='h-4 w-4' />

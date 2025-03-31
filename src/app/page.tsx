@@ -6,9 +6,11 @@ import axios from 'axios'
 import { useState } from 'react'
 import { FaUserCircle } from 'react-icons/fa'
 import { PiOpenAiLogoDuotone } from 'react-icons/pi'
-import { highlight } from 'sugar-high'
+import { SendHorizonal } from 'lucide-react'
 import 'prismjs/themes/prism.css'
 import { Header } from '@/components/header'
+import { Button } from '@/components/ui/button'
+import RenderContent from '@/components/SyntaxHighliter'
 
 const Home = () => {
   const [prompt, setPrompt] = useState<string>('')
@@ -52,36 +54,10 @@ const Home = () => {
     }
   }
 
-  const renderContent = (content: string) => {
-    const inlineCodeRegex = /`([^`]+)`/g
-
-    const blockCodeRegex = /```([\s\S]+?)```/g
-
-    let processedContent = content.replace(blockCodeRegex, (match, code) => {
-      const highlightedCode = highlight(code.trim())
-      return `<pre class="bg-gray-800 text-white p-3 rounded-lg w-full overflow-auto my-3">${highlightedCode}</pre>`
-    })
-
-    processedContent = processedContent.replace(
-      inlineCodeRegex,
-      (match, code) => {
-        const highlightedCode = highlight(code)
-        return `<code class="bg-gray-800 text-white p-1 rounded">${highlightedCode}</code>`
-      }
-    )
-
-    return (
-      <div
-        className='w-[90%]'
-        dangerouslySetInnerHTML={{ __html: processedContent }}
-      />
-    )
-  }
-
   return (
-    <div className='py-5 px-10 max-w-screen overflow-x-clip min-h-screen flex'>
+    <div className='py-5 px-10 max-w-screen overflow-x-clip min-h-screen flex relative'>
       <Header />
-      <div className='w-full flex flex-col items-start gap-5 mt-16'>
+      <div className='w-full flex flex-col items-start gap-5 mt-16 mb-[90px]'>
         <div className='w-full flex flex-col items-start gap-5'>
           {messages.map((message, idx) => (
             <div key={idx} className='w-full flex items-start gap-3'>
@@ -97,22 +73,33 @@ const Home = () => {
                 )}
               </div>
               <div className='w-full'>
-                {message.role === 'user'
-                  ? String(message.content)
-                  : idx !== generatedIdx
-                  ? renderContent(String(message.content))
-                  : renderContent(String(displayWords.join(' ')))}
+                {message.role === 'user' ? (
+                  String(message.content)
+                ) : idx !== generatedIdx ? (
+                  <RenderContent content={String(message.content)} />
+                ) : (
+                  <RenderContent content={String(displayWords.join(' '))} />
+                )}
               </div>
             </div>
           ))}
         </div>
 
-        <form onSubmit={sendMessage} className='w-full mt-auto'>
+        <form
+          onSubmit={sendMessage}
+          className='w-[95%] py-3 rounded-lg shadow-2xl shadow-black/5 dark:shadow-white/5 flex items-center gap-3 fixed bottom-5 -translate-x-1/2 left-1/2 px-5 bg-white dark:bg-[#0A0A0A] border'
+        >
           <Input
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder='Say something...'
+            className='h-[40px] rounded-[5px] !bg-transparent'
           />
+
+          <Button className='w-[120px] cursor-pointer h-[40px] rounded-[5px] flex items-center gap-1.5'>
+            Send
+            <SendHorizonal />
+          </Button>
         </form>
       </div>
     </div>
