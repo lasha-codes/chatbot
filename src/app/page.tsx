@@ -8,6 +8,7 @@ import { FaUserCircle } from 'react-icons/fa'
 import { PiOpenAiLogoDuotone } from 'react-icons/pi'
 import { highlight } from 'sugar-high'
 import 'prismjs/themes/prism.css'
+import { Header } from '@/components/header'
 
 const Home = () => {
   const [prompt, setPrompt] = useState<string>('')
@@ -27,7 +28,7 @@ const Home = () => {
       return newMessages
     })
 
-    const { data } = await axios.post(`/api/bot`, {
+    const { data } = await axios.post(`/api/bot/deepseek/r1`, {
       messages: [...messages, newMessage],
     })
 
@@ -58,7 +59,7 @@ const Home = () => {
 
     let processedContent = content.replace(blockCodeRegex, (match, code) => {
       const highlightedCode = highlight(code.trim())
-      return `<pre class="bg-gray-800 text-white p-3 rounded-lg max-full min-w-[calc(100%-70px)] max-w-[calc(100%-70px)] overflow-auto my-3">${highlightedCode}</pre>`
+      return `<pre class="bg-gray-800 text-white p-3 rounded-lg w-full overflow-auto my-3">${highlightedCode}</pre>`
     })
 
     processedContent = processedContent.replace(
@@ -71,15 +72,16 @@ const Home = () => {
 
     return (
       <div
-        className='w-full'
+        className='w-[90%]'
         dangerouslySetInnerHTML={{ __html: processedContent }}
       />
     )
   }
 
   return (
-    <div className='p-10'>
-      <div className='w-full flex flex-col items-start gap-5'>
+    <div className='py-5 px-10 max-w-screen overflow-x-clip min-h-screen flex'>
+      <Header />
+      <div className='w-full flex flex-col items-start gap-5 mt-16'>
         <div className='w-full flex flex-col items-start gap-5'>
           {messages.map((message, idx) => (
             <div key={idx} className='w-full flex items-start gap-3'>
@@ -105,7 +107,7 @@ const Home = () => {
           ))}
         </div>
 
-        <form onSubmit={sendMessage} className='w-full'>
+        <form onSubmit={sendMessage} className='w-full mt-auto'>
           <Input
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}

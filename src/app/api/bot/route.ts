@@ -4,14 +4,14 @@ import { NextResponse } from 'next/server'
 
 export const POST = async (req: Request) => {
   try {
-    const { messages } = await req.json()
+    const { messages, model = null } = await req.json()
 
     const response = await generateText({
-      model: google('gemini-1.5-flash-latest'),
+      model: google(model || 'gemini-1.5-flash-latest'),
       messages,
     })
 
-    return NextResponse.json({ response: response.text })
+    return NextResponse.json({ response: response.text }, { status: 201 })
   } catch (err) {
     console.error(err)
     return NextResponse.json({ response: 'Limit reached' })
