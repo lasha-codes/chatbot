@@ -1,33 +1,80 @@
 'use client'
 
 import { Input } from '@/components/ui/input'
+import { CoreMessage } from 'ai'
 import axios from 'axios'
 import { useState } from 'react'
 import { FaUserCircle } from 'react-icons/fa'
 import { PiOpenAiLogoDuotone } from 'react-icons/pi'
-
-interface Message {
-  role: 'user' | 'ai'
-  content: string
-}
+import { highlight } from 'sugar-high'
+import 'prismjs/themes/prism.css'
 
 const Home = () => {
   const [prompt, setPrompt] = useState<string>('')
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<CoreMessage[]>([])
+  const [displayWords, setDisplayWords] = useState<string[]>([])
+  const [generatedIdx, setGeneratedIdx] = useState<number>()
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
-    setMessages((prev) => [...prev, { role: 'user', content: prompt }])
+
+    const newMessage = { role: 'user', content: prompt } as CoreMessage
+
     setPrompt('')
 
-    const { data } = await axios.post(`/api/bot`, {
-      prompt,
+    setMessages((prev) => {
+      const newMessages = [...prev, newMessage]
+      return newMessages
     })
 
-    setMessages((prev) => [
-      ...prev,
-      { role: 'ai', content: data?.response || 'Something went wrong' },
-    ])
+    const { data } = await axios.post(`/api/bot`, {
+      messages: [...messages, newMessage],
+    })
+
+    setMessages((prev) => {
+      setGeneratedIdx(prev.length)
+      const aiMessage = {
+        role: 'assistant',
+        content: data?.response || "Couldn't generate response",
+      } as CoreMessage
+      return [...prev, aiMessage]
+    })
+
+    if (data.response) {
+      const words = data.response.split(' ')
+      setDisplayWords([])
+      words.forEach((word: string, idx: number) => {
+        setTimeout(() => {
+          setDisplayWords((prev) => [...prev, word])
+        }, 50 * idx)
+      })
+    }
+  }
+
+  const renderContent = (content: string) => {
+    const inlineCodeRegex = /`([^`]+)`/g
+
+    const blockCodeRegex = /```([\s\S]+?)```/g
+
+    let processedContent = content.replace(blockCodeRegex, (match, code) => {
+      const highlightedCode = highlight(code.trim())
+      return `<pre class="bg-gray-800 text-white p-3 rounded-lg max-full min-w-[calc(100%-70px)] max-w-[calc(100%-70px)] overflow-auto my-3">${highlightedCode}</pre>`
+    })
+
+    processedContent = processedContent.replace(
+      inlineCodeRegex,
+      (match, code) => {
+        const highlightedCode = highlight(code)
+        return `<code class="bg-gray-800 text-white p-1 rounded">${highlightedCode}</code>`
+      }
+    )
+
+    return (
+      <div
+        className='w-full'
+        dangerouslySetInnerHTML={{ __html: processedContent }}
+      />
+    )
   }
 
   return (
@@ -47,7 +94,13 @@ const Home = () => {
                   </div>
                 )}
               </div>
-              <p className='w-full'>{message.content}</p>
+              <div className='w-full'>
+                {message.role === 'user'
+                  ? String(message.content)
+                  : idx !== generatedIdx
+                  ? renderContent(String(message.content))
+                  : renderContent(String(displayWords.join(' ')))}
+              </div>
             </div>
           ))}
         </div>

@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -110,6 +110,18 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+:root {
+  --sh-class: #e5c07b;
+  --sh-identifier: #61afef;
+  --sh-sign: #abb2bf;
+  --sh-property: #d19a66;
+  --sh-entity: #56b6c2;
+  --sh-jsxliterals: #ffffff;
+  --sh-string: #98c379;
+  --sh-keyword: #e06c75;
+  --sh-comment: #5c6370;
 }
 
 @layer base {
