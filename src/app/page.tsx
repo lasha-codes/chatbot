@@ -19,9 +19,16 @@ const Home = () => {
   const [messages, setMessages] = useState<CoreMessage[]>([])
   const [displayWords, setDisplayWords] = useState<string[]>([])
   const [generatedIdx, setGeneratedIdx] = useState<number>()
+  const [error, setError] = useState<string | undefined>(undefined)
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!prompt.trim()) {
+      return setError('Prompt cant be empty.')
+    } else if (error) {
+      setError('')
+    }
 
     const newMessage = {
       role: 'user',
@@ -93,7 +100,7 @@ const Home = () => {
                 <div
                   className={`w-full ${
                     message.role === 'user' &&
-                    'bg-[#282C34] !w-fit px-6 py-3 rounded-[5px]'
+                    'bg-[#282C34] !w-fit px-6 py-3 rounded-[5px] text-white'
                   }`}
                 >
                   {message.role === 'user' ? (
@@ -117,7 +124,9 @@ const Home = () => {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder='Say something...'
-            className='h-[40px] rounded-[5px] !bg-transparent'
+            className={`h-[40px] rounded-[5px] !bg-transparent ${
+              error && '!border-red-500'
+            }`}
           />
 
           <Button className='w-[120px] cursor-pointer h-[40px] rounded-[5px] flex items-center gap-1.5'>
