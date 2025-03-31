@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Bot, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -11,16 +11,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from './theme-toggle'
-
-const models = [
-  { id: 'gpt-4o', name: 'GPT-4o' },
-  { id: 'claude-3-opus', name: 'Claude 3 Opus' },
-  { id: 'claude-3-sonnet', name: 'Claude 3 Sonnet' },
-  { id: 'llama-3', name: 'Llama 3' },
-]
+import { models } from '@/config/models'
+import Image from 'next/image'
+import { GlobalContext } from './global-provider'
 
 export function Header() {
-  const [selectedModel, setSelectedModel] = useState(models[0])
+  const { selectedModel, setSelectedModel } = useContext(GlobalContext)
 
   return (
     <header className='fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-background/60 border-b border-border/40 shadow-2xl shadow-black/5'>
@@ -46,8 +42,10 @@ export function Header() {
 }
 
 interface ModelSelectorProps {
-  selectedModel: { id: string; name: string }
-  setSelectedModel: (model: { id: string; name: string }) => void
+  selectedModel: (typeof models)[number]
+  setSelectedModel: React.Dispatch<
+    React.SetStateAction<(typeof models)[number]>
+  >
 }
 
 function ModelSelector({
@@ -59,22 +57,39 @@ function ModelSelector({
       <DropdownMenuTrigger asChild>
         <Button
           variant='outline'
-          className='flex items-center justify-between gap-2 rounded-[4px] w-[200px] dark:bg-[#0A0A0A]'
+          className='flex items-center justify-between gap-2 rounded-[4px] w-[230px] dark:bg-[#0A0A0A]'
         >
-          <span>Model: {selectedModel.name}</span>
+          <div className='flex items-center gap-2.5'>
+            <Image
+              src={selectedModel.icon}
+              alt={`${selectedModel.name} icon`}
+              width={20}
+              height={20}
+            />
+            <span>Model: {selectedModel.name}</span>
+          </div>
           <ChevronDown className='h-4 w-4' />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end' className='w-[200px] rounded-[4px]'>
+      <DropdownMenuContent
+        align='end'
+        className='w-[230px] rounded-[4px] flex flex-col items-start gap-1'
+      >
         {models.map((model) => (
           <DropdownMenuItem
             key={model.id}
             className={cn(
-              'cursor-pointer rounded-[4px]',
+              'cursor-pointer rounded-[4px] flex items-center gap-3 w-full',
               selectedModel.id === model.id && 'bg-accent'
             )}
             onClick={() => setSelectedModel(model)}
           >
+            <Image
+              src={model.icon}
+              alt={`${model.name} icon`}
+              width={20}
+              height={20}
+            />
             {model.name}
           </DropdownMenuItem>
         ))}

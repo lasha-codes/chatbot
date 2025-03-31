@@ -2,17 +2,19 @@
 
 import { Input } from '@/components/ui/input'
 import { CoreMessage } from 'ai'
-import axios from 'axios'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { FaUserCircle } from 'react-icons/fa'
-import { PiOpenAiLogoDuotone } from 'react-icons/pi'
 import { SendHorizonal } from 'lucide-react'
 import 'prismjs/themes/prism.css'
 import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
 import RenderContent from '@/components/SyntaxHighliter'
+import { GlobalContext } from '@/components/global-provider'
+import { models } from '@/config/models'
+import Image from 'next/image'
 
 const Home = () => {
+  const { selectedModel } = useContext(GlobalContext)
   const [prompt, setPrompt] = useState<string>('')
   const [messages, setMessages] = useState<CoreMessage[]>([])
   const [displayWords, setDisplayWords] = useState<string[]>([])
@@ -21,7 +23,10 @@ const Home = () => {
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const newMessage = { role: 'user', content: prompt } as CoreMessage
+    const newMessage = {
+      role: 'user',
+      content: prompt,
+    } as CoreMessage
 
     setPrompt('')
 
@@ -30,15 +35,14 @@ const Home = () => {
       return newMessages
     })
 
-    const { data } = await axios.post(`/api/bot/deepseek/r1`, {
-      messages: [...messages, newMessage],
-    })
+    const data = await selectedModel.chat({ messages, newMessage })
 
     setMessages((prev) => {
       setGeneratedIdx(prev.length)
       const aiMessage = {
         role: 'assistant',
         content: data?.response || "Couldn't generate response",
+        model: selectedModel.id,
       } as CoreMessage
       return [...prev, aiMessage]
     })
@@ -58,31 +62,51 @@ const Home = () => {
     <div className='py-5 px-10 max-w-screen overflow-x-clip min-h-screen flex relative'>
       <Header />
       <div className='w-full flex flex-col items-start gap-5 mt-16 mb-[90px]'>
-        <div className='w-full flex flex-col items-start gap-5'>
-          {messages.map((message, idx) => (
-            <div key={idx} className='w-full flex items-start gap-3'>
-              <div className=''>
-                {message.role === 'user' ? (
-                  <div className='flex items-center gap-2'>
-                    <FaUserCircle className='text-4xl' />
-                  </div>
-                ) : (
-                  <div className='flex items-center gap-2'>
-                    <PiOpenAiLogoDuotone className='text-4xl text-[#2897d8]' />
-                  </div>
-                )}
+        <div className='w-full flex flex-col items-start gap-8'>
+          {messages.map((message, idx) => {
+            // @ts-expect-error
+            const icon = models.find((model) => model.id === message?.model)
+              ?.icon as string | undefined
+            return (
+              <div
+                key={idx}
+                className={`w-full flex items-start gap-5 ${
+                  message.role === 'user' && ''
+                }`}
+              >
+                <div>
+                  {message.role === 'user' ? (
+                    <div className='flex items-center gap-2'>
+                      <FaUserCircle className='text-4xl' />
+                    </div>
+                  ) : (
+                    <div className='flex items-center gap-2'>
+                      <Image
+                        width={37}
+                        height={0}
+                        src={icon?.trim() ? icon : '/icons/google.svg'}
+                        alt='Ai logo'
+                      />
+                    </div>
+                  )}
+                </div>
+                <div
+                  className={`w-full ${
+                    message.role === 'user' &&
+                    'bg-[#282C34] !w-fit px-6 py-3 rounded-[5px]'
+                  }`}
+                >
+                  {message.role === 'user' ? (
+                    String(message.content)
+                  ) : idx !== generatedIdx ? (
+                    <RenderContent content={String(message.content)} />
+                  ) : (
+                    <RenderContent content={String(displayWords.join(' '))} />
+                  )}
+                </div>
               </div>
-              <div className='w-full'>
-                {message.role === 'user' ? (
-                  String(message.content)
-                ) : idx !== generatedIdx ? (
-                  <RenderContent content={String(message.content)} />
-                ) : (
-                  <RenderContent content={String(displayWords.join(' '))} />
-                )}
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         <form
