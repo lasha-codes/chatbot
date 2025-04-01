@@ -19,7 +19,7 @@ export function Header() {
   const { selectedModel, setSelectedModel } = useContext(GlobalContext)
 
   return (
-    <header className='fixed top-0 left-0 right-0 z-50 backdrop-blur-sm bg-background/60 border-b border-border/40 shadow-2xl shadow-black/5'>
+    <header className='fixed top-0 left-0 right-0 backdrop-blur-sm bg-background/60 border-b border-border/40 shadow-2xl shadow-black/5 z-[500]'>
       <div className='container mx-auto px-4 py-3 flex items-center justify-between'>
         <div className='flex items-center gap-2'>
           <div className='h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center'>
@@ -73,7 +73,7 @@ function ModelSelector({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align='end'
-        className='w-[230px] rounded-[4px] flex flex-col items-start gap-1'
+        className='w-[230px] rounded-[4px] flex flex-col items-start gap-1 z-[600]'
       >
         {models.map((model) => (
           <DropdownMenuItem

@@ -184,7 +184,7 @@ const ChatInterface = ({ messages, setMessages }: Props) => {
       )}
       <form
         onSubmit={sendMessage}
-        className='w-[95%] py-3 rounded-[8px] shadow-2xl shadow-black/5 dark:shadow-white/5 flex flex-col items-start fixed bottom-5 -translate-x-1/2 left-1/2 px-5 gap-3 bg-white dark:bg-[#0A0A0A] border'
+        className='w-[95%] py-3 rounded-[8px] shadow-2xl shadow-black/5 dark:shadow-white/5 flex flex-col items-start fixed bottom-5 -translate-x-1/2 left-1/2 px-5 gap-3 bg-white dark:bg-[#0A0A0A] border z-[999]'
       >
         <textarea
           value={prompt}
