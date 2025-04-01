@@ -113,8 +113,6 @@ const Home = () => {
                     (model) => model.id === message?.model
                   )
 
-                  console.log(modelData?.icon)
-
                   return (
                     <div
                       key={idx}
