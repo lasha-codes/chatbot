@@ -8,7 +8,7 @@ const gemini15Chat = async ({
   messages: CoreMessage[]
   newMessage: CoreMessage
 }) => {
-  const { data } = await axios.post(`/api/bot/gemini/1.5`, {
+  const { data } = await axios.post(`/api/bot/gemini`, {
     messages: [...messages, newMessage],
   })
 

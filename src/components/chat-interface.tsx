@@ -8,9 +8,9 @@ import Image from 'next/image'
 import { GlobalContext } from './global-provider'
 import RenderContent from './SyntaxHighliter'
 import AIThinkingLoader from './ai-thinking'
-import { Input } from './ui/input'
 import { Button } from './ui/button'
-import { Loader, SendHorizonal } from 'lucide-react'
+import { SendHorizonal } from 'lucide-react'
+import Loader from './loader'
 
 interface Props {
   messages: CoreMessage[]
@@ -106,7 +106,7 @@ const ChatInterface = ({ messages, setMessages }: Props) => {
     <>
       {messages.length > 0 ? (
         <div className='py-5 px-10 max-w-screen overflow-x-clip min-h-screen flex relative'>
-          <div className='w-full flex flex-col items-start gap-5 mt-16 mb-[90px]'>
+          <div className='w-full flex flex-col items-start gap-5 mt-16 mb-[200px]'>
             <div className='w-full flex flex-col items-start'>
               <div className='w-full flex flex-col items-start gap-8'>
                 {messages.map((message, idx) => {
@@ -123,18 +123,15 @@ const ChatInterface = ({ messages, setMessages }: Props) => {
                     >
                       <div>
                         {message.role === 'user' ? (
-                          <div className='flex items-center gap-2'>
-                            <FaUserCircle className='text-4xl' />
-                          </div>
+                          <FaUserCircle className='text-4xl' />
                         ) : (
-                          <div className='flex items-center gap-2'>
+                          <div className='bg-[#282C34] w-[37px] h-[37px] rounded-full relative flex items-center justify-center'>
                             <Image
-                              width={37}
-                              height={0}
                               src={modelData?.icon || '/icons/google.svg'}
                               alt='Ai logo'
                               objectFit='contain'
-                              className='min-w-[37px] max-w-[37px]'
+                              width={25}
+                              height={25}
                             />
                           </div>
                         )}
@@ -187,35 +184,53 @@ const ChatInterface = ({ messages, setMessages }: Props) => {
       )}
       <form
         onSubmit={sendMessage}
-        className='w-[95%] py-3 rounded-lg shadow-2xl shadow-black/5 dark:shadow-white/5 flex items-center gap-3 fixed bottom-5 -translate-x-1/2 left-1/2 px-5 bg-white dark:bg-[#0A0A0A] border'
+        className='w-[95%] py-3 rounded-[8px] shadow-2xl shadow-black/5 dark:shadow-white/5 flex flex-col items-start fixed bottom-5 -translate-x-1/2 left-1/2 px-5 gap-3 bg-white dark:bg-[#0A0A0A] border'
       >
-        <Input
+        <textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          placeholder='Say something...'
-          className={`h-[40px] rounded-[5px] !bg-transparent ${
-            error && '!border-red-500'
-          }`}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault()
+              sendMessage(e)
+            }
+          }}
+          placeholder='Ask anything...'
+          className={`rounded-[5px] pt-2 !bg-transparent w-full  outline-none resize-none font-light h-[80px] overflow-y-auto`}
         />
-        <Button
-          disabled={aiThinking}
-          className={`w-[120px] cursor-pointer h-[40px] rounded-[5px] flex items-center gap-1.5 ${
-            generating &&
-            '!text-white !bg-red-600 hover:!bg-red-700 dark:!bg-red-700 dark:hover:!bg-red-800'
-          }`}
-        >
-          {!generating ? (
-            <>
-              Send
-              <SendHorizonal />
-            </>
-          ) : (
-            <>
-              Skip
-              <Loader />
-            </>
-          )}
-        </Button>
+        <div className='w-full flex items-center justify-between'>
+          <div className='flex items-center gap-2'>
+            <Image
+              src={selectedModel.icon}
+              width={23}
+              height={0}
+              objectFit='contain'
+              alt={selectedModel.name}
+            />
+            <div className='flex items-center gap-2 font-medium'>
+              {selectedModel.name}
+            </div>
+          </div>
+          <Button
+            disabled={aiThinking}
+            className={`w-[120px] cursor-pointer h-[40px] rounded-[5px] flex items-center gap-1.5 ${
+              generating &&
+              '!text-white !bg-red-600 hover:!bg-red-700 dark:!bg-red-700 dark:hover:!bg-red-800'
+            }`}
+          >
+            {!generating ? (
+              <>
+                Send
+                <SendHorizonal />
+              </>
+            ) : (
+              <>
+                Skip
+                <Loader />
+              </>
+            )}
+          </Button>
+        </div>
       </form>
     </>
   )
