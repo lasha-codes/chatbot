@@ -13,6 +13,7 @@ import { GlobalContext } from '@/components/global-provider'
 import { models } from '@/config/models'
 import Image from 'next/image'
 import Loader from '@/components/loader'
+import AIThinkingLoader from '@/components/ai-thinking'
 
 const Home = () => {
   const { selectedModel } = useContext(GlobalContext)
@@ -24,6 +25,7 @@ const Home = () => {
   )
   const [error, setError] = useState<string | undefined>(undefined)
   const [generating, setGenerating] = useState<boolean>(false)
+  const [aiThinking, setAiThinking] = useState<boolean>(false)
   const bottomViewRef = useRef<HTMLDivElement | null>(null)
   const cancelRef = useRef(false)
 
@@ -50,6 +52,8 @@ const Home = () => {
         setError(undefined)
       }
 
+      setAiThinking(true)
+
       cancelRef.current = false
 
       setGenerating(true)
@@ -67,6 +71,8 @@ const Home = () => {
       })
 
       const data = await selectedModel.chat({ messages, newMessage })
+
+      setAiThinking(false)
 
       setMessages((prev) => {
         setGeneratedIdx(prev.length)
@@ -157,6 +163,12 @@ const Home = () => {
                     </div>
                   )
                 })}
+
+                {aiThinking && (
+                  <AIThinkingLoader
+                    text={`${selectedModel.name} is thinking`}
+                  />
+                )}
               </div>
 
               <div ref={bottomViewRef} />
@@ -194,6 +206,7 @@ const Home = () => {
           }`}
         />
         <Button
+          disabled={aiThinking}
           className={`w-[120px] cursor-pointer h-[40px] rounded-[5px] flex items-center gap-1.5 ${
             generating &&
             '!text-white !bg-red-600 hover:!bg-red-700 dark:!bg-red-700 dark:hover:!bg-red-800'
