@@ -47,6 +47,7 @@ const RenderContent = React.memo(({ content }: { content: string }) => {
                       </SyntaxHighlighter>
 
                       <Button
+                        disabled={copiedContent === code}
                         onClick={() => copyToClipboard(code)}
                         variant='outline'
                         className='absolute top-2 right-2 text-white px-2 py-1 rounded z-[99] cursor-pointer'

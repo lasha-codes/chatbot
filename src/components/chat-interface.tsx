@@ -8,9 +8,11 @@ import Image from 'next/image'
 import { GlobalContext } from './global-provider'
 import RenderContent from './SyntaxHighliter'
 import AIThinkingLoader from './ai-thinking'
-import { Button } from './ui/button'
+import { Button, buttonVariants } from './ui/button'
 import { SendHorizonal } from 'lucide-react'
 import Loader from './loader'
+import { Paperclip } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface Props {
   messages: CoreMessage[]
@@ -200,15 +202,33 @@ const ChatInterface = ({ messages, setMessages }: Props) => {
         />
         <div className='w-full flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Image
-              src={selectedModel.icon}
-              width={23}
-              height={0}
-              objectFit='contain'
-              alt={selectedModel.name}
+            <label
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'rounded-[5px] cursor-pointer'
+              )}
+              htmlFor='attachments'
+            >
+              <Paperclip className='scale-120' />
+            </label>
+            <input
+              id='attachments'
+              type='file'
+              accept='image/png, image/webp, image/jpg, image/jpeg'
+              multiple
+              className='pointe-events-none opacity-0 invisible absolute -z-[999]'
             />
-            <div className='flex items-center gap-2 font-medium'>
-              {selectedModel.name}
+            <div className='flex items-center gap-2'>
+              <Image
+                src={selectedModel.icon}
+                width={23}
+                height={0}
+                objectFit='contain'
+                alt={selectedModel.name}
+              />
+              <div className='flex items-center gap-2 font-medium'>
+                {selectedModel.name}
+              </div>
             </div>
           </div>
           <Button
